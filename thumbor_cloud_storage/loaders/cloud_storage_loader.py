@@ -1,6 +1,7 @@
 from tornado.concurrent import return_future
 from gcloud import storage
 from collections import defaultdict
+from urllib2 import unquote
 
 buckets = defaultdict(dict)
 
@@ -13,7 +14,8 @@ def load(context, path, callback):
         client = storage.Client(project_id)
         bucket = client.get_bucket(bucket_id)
         buckets[project_id][bucket_id] = bucket
-
+        
+    path = unquote(path).decode('utf-8')
     blob = bucket.get_blob(path)
     if blob:
         callback(blob.download_as_string())
